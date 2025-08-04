@@ -1,3 +1,12 @@
+# ✅ TODO convert comments in each method into a python docstring
+# ✅ TODO start commiting to git and make this a new project
+# ✅ TODO use enumerate(self.tasks) to loop through tasks instead for view_tasks()
+# ✅ TODO change self.input to 'choice' - no need to make this an attribute, just use a basic variable 
+# ✅ TODO use f-strings in print statements instead of print(...,...,...)
+# ✅ TODO in view_tasks change 2nd if to an else - only 2 options for length are >0 and =0
+# ✅ TODO use try/except block to handle invalid user input choice
+# TODO create optional "due date" feature for any given task
+
 class Task:
     description: str
     done: bool
@@ -21,56 +30,64 @@ class Reminders:
         self.tasks = []
 
     def add_task(self) -> None:
-        self.input = Task(input('What is the task? '))
-        self.tasks.append(self.input)
-        print('Added task "', self.input, '" to Reminder list')
-        #Ask the user to enter a task description.
-        #Create a Task object using that description and add it to self.tasks.
-        #Print a confirmation message
+        '''Ask the user to enter a task description.
+        Create a Task object using that description and add it to self.tasks.
+        Print a confirmation message'''
+         
+        choice = Task(input('What is the task? '))
+        self.tasks.append(choice)
+        print(f'Added task "{choice}" to Reminder list')
+
 
     def view_tasks(self) -> None:
         if len(self.tasks) > 0:
-            for counter in range(0, len(self.tasks)):
-                print('\nTask ', counter + 1, ': ',self.tasks[counter], )
-        if len(self.tasks) == 0:
+            for index, task in enumerate(self.tasks, start=1):
+                print(f'\nTask {index}: {task}')
+        else:
             print('\nNo tasks')
         
-        #Print all tasks in self.tasks.
-        #Use a loop to show each task with its number and status.
-        #Print a message if there are no tasks.
+        '''Print all tasks in self.tasks.
+        Use a loop to show each task with its number and status.
+        Print a message if there are no tasks.'''
 
     def mark_task_done(self) -> None:
         if len(self.tasks) > 0:
             self.view_tasks()
             while True:
-                self.input = int(input('\nenter task number to mark as done: '))
-                if self.input >= 1 and self.input <= len(self.tasks):
-                    self.tasks[self.input - 1].mark_done()
-                    print('Marked task "',self.tasks[self.input - 1],'" as done' )
-                    break
+                try:
+                    choice = int(input('\nenter task number to mark as done: '))
+                    self.tasks[choice - 1].mark_done()
+                except IndexError:
+                    print('Invalid task number')
+                except ValueError:
+                    print('That\'s not a number')
                 else:
-                    print('Not a valid task number')
+                    print(f'Marked task "{self.tasks[choice - 1]}" as done' )
+                    break
         else:
             print('\nNo tasks')
         
-        #Show tasks, ask user for a task number, and mark that task as done.
-        #Handle invalid input with try/except and input checks.
+        '''Show tasks, ask user for a task number, and mark that task as done.
+        Handle invalid input with try/except and input checks.'''
 
     def delete_task(self) -> None:
         if len(self.tasks) > 0:
-            self.input = int(input('\nWhich task Would you like to delete? '))
+            choice = int(input('\nWhich task would you like to delete? '))
             while True:
-                self.view_tasks()
-                if self.input >= 1 and self.input <= len(self.tasks):
-                    del self.tasks[self.input - 1]
-                    break
-                else:
+                try:
+                    self.view_tasks()
+                    del self.tasks[choice - 1]
+                except IndexError:
                     print('invalid task number, please reenter.')
+                except ValueError:
+                    print('That\'s not a number')
+                else:
+                    break
         else:
             print('\nNo tasks to delete')
        
-        #Show tasks, ask user for a task number, and remove that task from the list.
-        #Handle invalid input safely.
+        '''Show tasks, ask user for a task number, and remove that task from the list.
+        Handle invalid input safely.'''
 
     def show_menu(self) -> None:
         print('\nTo-Do List Menu')
