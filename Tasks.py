@@ -7,20 +7,38 @@
 # ✅ TODO use try/except block to handle invalid user input choice
 # TODO create optional "due date" feature for any given task
 
+import datetime
+
 class Task:
     description: str
     done: bool
+    due_date: datetime.datetime
+    delta: datetime.datetime
     
-    def __init__(self, desc: str) -> None:
+    def __init__(self, desc: str, due = None, delta = None) -> None:
         self.description = desc
         self.done = False
+        self.due_date = due
+        self.delta = delta
 
     def mark_done(self) -> None:
         self.done = True
 
     def __str__(self) -> str:
         status: str = '[x]' if self.done else '[ ]'
-        return f'{status} {self.description}'
+        if self.due_date is not None:
+            self.due_date = self.due_date.strftime('%B-%d-%Y-%I-%M')
+            if  self.delta > datetime.timedelta(seconds=0):
+                return f'{status} {self.description}: Due {self.due_date}, in {self.delta}'
+            elif datetime.timedelta(seconds=0) == self.delta:
+                return f'{status} {self.description}: Due now'
+            else:
+                return f'{status} {self.description}: Due {self.due_date}, late by {abs(self.delta)}'
+        else:
+            return f'{status} {self.description}'
+        
+
+#if self.due_date is none
 
 # Define the Reminders class to manage the list of tasks
 class Reminders:
@@ -34,21 +52,50 @@ class Reminders:
         Create a Task object using that description and add it to self.tasks.
         Print a confirmation message'''
          
-        choice = Task(input('What is the task? '))
-        self.tasks.append(choice)
-        print(f'Added task "{choice}" to Reminder list')
-
+        name = input('What is the task? ')
+        while True:
+            date_choice = input('Do you want a due date? (y/n): ')
+            if date_choice.lower() != 'y' and date_choice.lower() != 'n':
+                print('Not a valid response')
+            elif date_choice.lower() == 'n':
+                choice = Task(name)
+                self.tasks.append(choice)
+                print(f'Added task "{choice}" to Reminder list')
+                break
+            elif date_choice.lower() == 'y':
+                date = input('Enter the Date (M/D/Y): ')
+                date = date.split('/')
+                month = int(date[0])
+                day = int(date[1])
+                year = int(date[2])
+                time = input('Enter the time (Hr:Min AM/PM)')
+                time = time.split(' ')
+                meridiem = time[1]
+                time = time[0]
+                time = time.split(':')
+                hour = int(time[0])
+                minute = int(time[1])
+                if meridiem.lower() == 'pm':
+                    hour = hour + 12
+                due_date = datetime.datetime(year, month, day, hour, minute, 0)
+                current_datetime = datetime.datetime.now()
+                delta = due_date - current_datetime
+                choice = Task(name, due_date, delta)
+                self.tasks.append(choice)
+                break
 
     def view_tasks(self) -> None:
+        '''Print all tasks in self.tasks.
+        Use a loop to show each task with its number and status.
+        Print a message if there are no tasks.'''
+
         if len(self.tasks) > 0:
             for index, task in enumerate(self.tasks, start=1):
                 print(f'\nTask {index}: {task}')
         else:
             print('\nNo tasks')
         
-        '''Print all tasks in self.tasks.
-        Use a loop to show each task with its number and status.
-        Print a message if there are no tasks.'''
+        
 
     def mark_task_done(self) -> None:
         if len(self.tasks) > 0:
