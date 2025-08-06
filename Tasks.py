@@ -30,14 +30,15 @@ class Task:
         if self.due_date is not None:
             if  self.delta > datetime.timedelta(seconds=0):
                 if self.done == False:
-                    return f'{status} {self.description}: Due {self.due_date.strftime('%B-%d-%Y-%I-%M')}, in {self.delta}'
+                    return f'{status} {self.description}: Due {self.due_date.strftime('%B-%d-%Y-%I-%M')}, in {self.delta.days} days, {int(self.delta.seconds // 3600)} hours, and {int((self.delta.seconds % 3600) // 60)} minutes.'
                 else:
                     return f'{status} {self.description}: Due {self.due_date.strftime('%B-%d-%Y-%I-%M')}'
             elif datetime.timedelta(seconds=0) == self.delta:
                 return f'{status} {self.description}: Due now'
             else:
                 if self.done == False:
-                    return f'{status} {self.description}: Due {self.due_date.strftime('%B-%d-%Y-%I-%M')}, late by {abs(self.delta)}'
+                    abs_delta = abs(self.delta)
+                    return f'{status} {self.description}: Due {self.due_date.strftime('%B-%d-%Y-%I-%M')}, late by {abs_delta.days} days, {int(abs_delta.seconds // 3600)} hours, and {int((abs_delta.seconds % 3600) // 60)} minutes.'
                 else:
                     return f'{status} {self.description}: Due {self.due_date.strftime('%B-%d-%Y-%I-%M')}'
         else:
@@ -105,6 +106,8 @@ class Reminders:
                         self.tasks.append(choice)
                         print(f'Added task "{choice}" to Reminder list')
                         break
+                    break
+                break
 
     def view_tasks(self) -> None:
         '''Print all tasks in self.tasks.
