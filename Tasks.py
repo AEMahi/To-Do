@@ -13,7 +13,7 @@ class Task:
     description: str
     done: bool
     due_date: datetime.datetime
-    delta: datetime.datetime
+    delta: datetime.timedelta
     
     def __init__(self, desc: str, due = None, delta = None) -> None:
         self.description = desc
@@ -26,14 +26,20 @@ class Task:
 
     def __str__(self) -> str:
         status: str = '[x]' if self.done else '[ ]'
+        print(type(self.due_date))
         if self.due_date is not None:
-            self.due_date = self.due_date.strftime('%B-%d-%Y-%I-%M')
             if  self.delta > datetime.timedelta(seconds=0):
-                return f'{status} {self.description}: Due {self.due_date}, in {self.delta}'
+                if self.done == False:
+                    return f'{status} {self.description}: Due {self.due_date.strftime('%B-%d-%Y-%I-%M')}, in {self.delta}'
+                else:
+                    return f'{status} {self.description}: Due {self.due_date.strftime('%B-%d-%Y-%I-%M')}'
             elif datetime.timedelta(seconds=0) == self.delta:
                 return f'{status} {self.description}: Due now'
             else:
-                return f'{status} {self.description}: Due {self.due_date}, late by {abs(self.delta)}'
+                if self.done == False:
+                    return f'{status} {self.description}: Due {self.due_date.strftime('%B-%d-%Y-%I-%M')}, late by {abs(self.delta)}'
+                else:
+                    return f'{status} {self.description}: Due {self.due_date.strftime('%B-%d-%Y-%I-%M')}'
         else:
             return f'{status} {self.description}'
         
@@ -82,6 +88,7 @@ class Reminders:
                 delta = due_date - current_datetime
                 choice = Task(name, due_date, delta)
                 self.tasks.append(choice)
+                print(f'Added task "{choice}" to Reminder list')
                 break
 
     def view_tasks(self) -> None:
