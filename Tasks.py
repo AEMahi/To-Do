@@ -5,7 +5,7 @@
 # ✅ TODO use f-strings in print statements instead of print(...,...,...)
 # ✅ TODO in view_tasks change 2nd if to an else - only 2 options for length are >0 and =0
 # ✅ TODO use try/except block to handle invalid user input choice
-# TODO create optional "due date" feature for any given task
+# ✅ TODO create optional "due date" feature for any given task
 
 import datetime
 
@@ -26,7 +26,7 @@ class Task:
 
     def __str__(self) -> str:
         status: str = '[x]' if self.done else '[ ]'
-        print(type(self.due_date))
+        #print(type(self.due_date))
         if self.due_date is not None:
             if  self.delta > datetime.timedelta(seconds=0):
                 if self.done == False:
@@ -69,27 +69,42 @@ class Reminders:
                 print(f'Added task "{choice}" to Reminder list')
                 break
             elif date_choice.lower() == 'y':
-                date = input('Enter the Date (M/D/Y): ')
-                date = date.split('/')
-                month = int(date[0])
-                day = int(date[1])
-                year = int(date[2])
-                time = input('Enter the time (Hr:Min AM/PM)')
-                time = time.split(' ')
-                meridiem = time[1]
-                time = time[0]
-                time = time.split(':')
-                hour = int(time[0])
-                minute = int(time[1])
-                if meridiem.lower() == 'pm':
-                    hour = hour + 12
-                due_date = datetime.datetime(year, month, day, hour, minute, 0)
-                current_datetime = datetime.datetime.now()
-                delta = due_date - current_datetime
-                choice = Task(name, due_date, delta)
-                self.tasks.append(choice)
-                print(f'Added task "{choice}" to Reminder list')
-                break
+                while True:
+                    try:
+                        date = input('Enter the Date (MM/DD/YYYY): ')
+                        date = date.split('/')
+                        month = int(date[0])
+                        day = int(date[1])
+                        year = int(date[2])
+                    except ValueError:
+                        print('that\'s not a number')
+                    else:
+                        break
+                while True:
+                    try:
+                        time = input('Enter the time (Hr:Min AM/PM): ')
+                        time = time.split(' ')
+                        meridiem = time[1]
+                        time = time[0]
+                        time = time.split(':')
+                        hour = int(time[0])
+                        minute = int(time[1])
+                        if meridiem.lower() == 'pm':
+                            hour = hour + 12
+                        due_date = datetime.datetime(year, month, day, hour, minute, 0)
+                        current_datetime = datetime.datetime.now()
+                        delta = due_date - current_datetime
+                        choice = Task(name, due_date, delta)
+                    except ValueError:
+                        print('That\'s not a correct time')
+                    except IndexError:
+                        print('That\'s not a correct time')
+                    except TypeError:
+                        print('That\'s not a correct time')
+                    else:
+                        self.tasks.append(choice)
+                        print(f'Added task "{choice}" to Reminder list')
+                        break
 
     def view_tasks(self) -> None:
         '''Print all tasks in self.tasks.
