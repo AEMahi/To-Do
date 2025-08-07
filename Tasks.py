@@ -144,10 +144,10 @@ class Reminders:
 
     def delete_task(self) -> None:
         if len(self.tasks) > 0:
-            choice: int = int(input('\nWhich task would you like to delete? '))
+            self.view_tasks()
             while True:
                 try:
-                    self.view_tasks()
+                    choice: int = int(input('\nWhich task would you like to delete? '))
                     del self.tasks[choice - 1]
                 except IndexError:
                     print('invalid task number, please reenter.')
