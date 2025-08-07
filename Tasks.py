@@ -123,6 +123,9 @@ class Reminders:
         
 
     def mark_task_done(self) -> None:
+        '''Show tasks, ask user for a task number, and mark that task as done.
+        Handle invalid input with try/except and input checks.'''
+
         if len(self.tasks) > 0:
             self.view_tasks()
             while True:
@@ -138,11 +141,11 @@ class Reminders:
                     break
         else:
             print('\nNo tasks')
-        
-        '''Show tasks, ask user for a task number, and mark that task as done.
-        Handle invalid input with try/except and input checks.'''
 
     def delete_task(self) -> None:
+        '''Show tasks, ask user for a task number, and remove that task from the list.
+        Handle invalid input safely.'''
+
         if len(self.tasks) > 0:
             self.view_tasks()
             while True:
@@ -157,9 +160,6 @@ class Reminders:
                     break
         else:
             print('\nNo tasks to delete')
-       
-        '''Show tasks, ask user for a task number, and remove that task from the list.
-        Handle invalid input safely.'''
 
     def show_menu(self) -> None:
         print('\nTo-Do List Menu')
