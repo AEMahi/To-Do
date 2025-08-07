@@ -1,12 +1,3 @@
-# ✅ TODO convert comments in each method into a python docstring
-# ✅ TODO start commiting to git and make this a new project
-# ✅ TODO use enumerate(self.tasks) to loop through tasks instead for view_tasks()
-# ✅ TODO change self.input to 'choice' - no need to make this an attribute, just use a basic variable 
-# ✅ TODO use f-strings in print statements instead of print(...,...,...)
-# ✅ TODO in view_tasks change 2nd if to an else - only 2 options for length are >0 and =0
-# ✅ TODO use try/except block to handle invalid user input choice
-# ✅ TODO create optional "due date" feature for any given task
-
 import datetime
 
 class Task:
@@ -119,8 +110,6 @@ class Reminders:
                 print(f'\nTask {index}: {task}')
         else:
             print('\nNo tasks')
-        
-        
 
     def mark_task_done(self) -> None:
         '''Show tasks, ask user for a task number, and mark that task as done.
@@ -186,7 +175,6 @@ class Reminders:
                 break
             else:
                 print('Invalid option. Please choose a number from 1 to 5.')
-
 
 # Main entry point
 if __name__ == '__main__':
