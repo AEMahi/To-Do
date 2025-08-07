@@ -127,7 +127,7 @@ class Reminders:
             self.view_tasks()
             while True:
                 try:
-                    choice = int(input('\nenter task number to mark as done: '))
+                    choice: int = int(input('\nenter task number to mark as done: '))
                     self.tasks[choice - 1].mark_done()
                 except IndexError:
                     print('Invalid task number')
@@ -144,7 +144,7 @@ class Reminders:
 
     def delete_task(self) -> None:
         if len(self.tasks) > 0:
-            choice = int(input('\nWhich task would you like to delete? '))
+            choice: int = int(input('\nWhich task would you like to delete? '))
             while True:
                 try:
                     self.view_tasks()
@@ -172,16 +172,16 @@ class Reminders:
     def run(self) -> None:
         while True:
             self.show_menu()
-            choice: str = input('Choose an option (15): ').strip()
-            if choice == '1':
+            choice: int = int(input('Choose an option (1-5): ').strip())
+            if choice == 1:
                 self.add_task()
-            elif choice == '2':
+            elif choice == 2:
                 self.view_tasks()
-            elif choice == '3':
+            elif choice == 3:
                 self.mark_task_done()
-            elif choice == '4':
+            elif choice == 4:
                 self.delete_task()
-            elif choice == '5':
+            elif choice == 5:
                 print('Goodbye!')
                 break
             else:
