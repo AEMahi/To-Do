@@ -1,4 +1,5 @@
 import datetime as dt
+from collections.abc import Callable
 
 class Task:
     description: str
@@ -33,9 +34,6 @@ class Task:
             return f'{status_desc_due}, late by {format_delta(abs(self.delta))}'
 
         return f'{status_desc_due}, in {format_delta(self.delta)}'
-
-
-#if self.due_date is none
 
 # Define the Reminders class to manage the list of tasks
 class Reminders:
@@ -136,6 +134,7 @@ class Reminders:
 
         if len(self.tasks) > 0:
             self.view_tasks()
+
             while True:
                 try:
                     choice: int = int(input('\nWhich task would you like to delete? '))
@@ -149,30 +148,30 @@ class Reminders:
         else:
             print('\nNo tasks to delete')
 
-    def show_menu(self) -> None:
-        print('\nTo-Do List Menu')
-        print('[1] Add Task')
-        print('[2] View Tasks')
-        print('[3] Mark Task as Done')
-        print('[4] Delete Task')
-        print('[5] Quit')
-
     def run(self) -> None:
+        actions: dict[str, Callable[[], None]] = {
+            '1': self.add_task,
+            '2': self.view_tasks,
+            '3': self.mark_task_done,
+            '4': self.delete_task,
+        }
+
         while True:
-            self.show_menu()
-            choice: int = int(input('Choose an option (1-5): ').strip())
-            if choice == 1:
-                self.add_task()
-            elif choice == 2:
-                self.view_tasks()
-            elif choice == 3:
-                self.mark_task_done()
-            elif choice == 4:
-                self.delete_task()
-            elif choice == 5:
+            print('\nTo-Do List Menu')
+            print('[1] Add Task')
+            print('[2] View Tasks')
+            print('[3] Mark Task as Done')
+            print('[4] Delete Task')
+            print('[5] Quit')
+
+            choice: str = input('Choose an option (1-5): ')
+            if choice == '5':
                 print('Goodbye!')
                 break
-            else:
+
+            try:
+                actions[choice]()
+            except KeyError:
                 print('Invalid option. Please choose a number from 1 to 5.')
 
 # Main entry point
