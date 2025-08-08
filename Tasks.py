@@ -17,17 +17,16 @@ class Task:
 
     def __str__(self) -> str:
         status: str = '[x]' if self.done else '[ ]'
-        #print(type(self.due_date))
         if self.due_date is not None:
             if  self.delta > datetime.timedelta(seconds=0):
-                if self.done == False:
+                if not self.done:
                     return f'{status} {self.description}: Due {self.due_date.strftime('%B-%d-%Y-%I-%M')}, in {self.delta.days} days, {int(self.delta.seconds // 3600)} hours, and {int((self.delta.seconds % 3600) // 60)} minutes.'
                 else:
                     return f'{status} {self.description}: Due {self.due_date.strftime('%B-%d-%Y-%I-%M')}'
             elif datetime.timedelta(seconds=0) == self.delta:
                 return f'{status} {self.description}: Due now'
             else:
-                if self.done == False:
+                if not self.done:
                     abs_delta = abs(self.delta)
                     return f'{status} {self.description}: Due {self.due_date.strftime('%B-%d-%Y-%I-%M')}, late by {abs_delta.days} days, {int(abs_delta.seconds // 3600)} hours, and {int((abs_delta.seconds % 3600) // 60)} minutes.'
                 else:
