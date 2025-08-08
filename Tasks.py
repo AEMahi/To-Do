@@ -49,28 +49,29 @@ class Reminders:
          
         name = input('What is the task? ')
         while True:
-            date_choice = input('Do you want a due date? (y/n): ')
-            if date_choice.lower() != 'y' and date_choice.lower() != 'n':
+            date_choice: str = input('Do you want a due date? (y/n): ').lower()
+
+            if date_choice not in {'y', 'n'}:
                 print('Not a valid response')
-            elif date_choice.lower() == 'n':
-                choice = Task(name)
-                self.tasks.append(choice)
-                print(f'Added task "{choice}" to Reminder list')
+
+            if date_choice == 'n':
+                task: Task = Task(name)
+                self.tasks.append(task)
+                print(f'Added task "{task}" to Reminder list')
                 break
-            elif date_choice.lower() == 'y':
+
+            if date_choice == 'y':
                 while True:
                     try:
-                        date = input('Enter the Date (MM/DD/YYYY): ')
-                        date = date.split('/')
-                        month = int(date[0])
-                        day = int(date[1])
-                        year = int(date[2])
+                        date: str = input('Enter the Date (MM/DD/YYYY): ')
+                        month, day, year = map(int, date.split('/'))
                     except ValueError:
-                        print('that\'s not a number')
+                        print('That\'s not a number')
                     else:
                         break
                 while True:
                     try:
+                        # TODO fix annotations and simplify variables
                         time = input('Enter the time (Hr:Min AM/PM): ')
                         time = time.split(' ')
                         meridiem = time[1]
@@ -79,22 +80,17 @@ class Reminders:
                         hour = int(time[0])
                         minute = int(time[1])
                         if meridiem.lower() == 'pm':
-                            hour = hour + 12
+                            hour += 12
                         due_date = dt.datetime(year, month, day, hour, minute, 0)
                         current_datetime = dt.datetime.now()
                         delta = due_date - current_datetime
-                        choice = Task(name, due_date, delta)
-                    except ValueError:
-                        print('That\'s not a correct time')
-                    except IndexError:
-                        print('That\'s not a correct time')
-                    except TypeError:
+                        task_due: Task = Task(name, due_date, delta)
+                    except (ValueError, IndexError, TypeError):
                         print('That\'s not a correct time')
                     else:
-                        self.tasks.append(choice)
-                        print(f'Added task "{choice}" to Reminder list')
+                        self.tasks.append(task_due)
+                        print(f'Added task "{task_due}" to Reminder list')
                         break
-                    break
                 break
 
     def view_tasks(self) -> None:
@@ -116,14 +112,14 @@ class Reminders:
             self.view_tasks()
             while True:
                 try:
-                    choice: int = int(input('\nenter task number to mark as done: '))
-                    self.tasks[choice - 1].mark_done()
+                    task_id: int = int(input('\nEnter task number to mark as done: '))
+                    self.tasks[task_id - 1].mark_done()
                 except IndexError:
                     print('Invalid task number')
                 except ValueError:
                     print('That\'s not a number')
                 else:
-                    print(f'Marked task "{self.tasks[choice - 1]}" as done' )
+                    print(f'Marked task "{self.tasks[task_id - 1]}" as done' )
                     break
         else:
             print('\nNo tasks')
@@ -137,12 +133,10 @@ class Reminders:
 
             while True:
                 try:
-                    choice: int = int(input('\nWhich task would you like to delete? '))
-                    del self.tasks[choice - 1]
-                except IndexError:
-                    print('invalid task number, please reenter.')
-                except ValueError:
-                    print('That\'s not a number')
+                    task_id: int = int(input('\nWhich task would you like to delete? '))
+                    del self.tasks[task_id - 1]
+                except (IndexError, ValueError):
+                    print('Invalid task number, please re-enter.')
                 else:
                     break
         else:
