@@ -73,8 +73,11 @@ class Reminders:
                         time, meridiem = time_merid[0], time_merid[1]
                         hour, minute = map(int, time.split(':'))
 
-                        if meridiem.lower() == 'pm':
+                        if meridiem.lower() == 'pm' and hour != 12:
                             hour += 12
+                        if meridiem.lower() == 'am' and hour == 12:
+                            hour = 0
+
                         due_date = dt.datetime(year, month, day, hour, minute, 0)
                         current_datetime = dt.datetime.now()
                         delta = due_date - current_datetime
