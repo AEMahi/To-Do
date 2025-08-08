@@ -45,7 +45,7 @@ class Reminders:
         Create a Task object using that description and add it to self.tasks.
         Print a confirmation message'''
          
-        name = input('What is the task? ')
+        desc = input('What is the task? ')
         while True:
             date_choice: str = input('Do you want a due date? (y/n): ').lower()
 
@@ -53,7 +53,7 @@ class Reminders:
                 print('Not a valid response')
 
             if date_choice == 'n':
-                task: Task = Task(name)
+                task: Task = Task(desc)
                 self.tasks.append(task)
                 print(f'Added task "{task}" to Reminder list')
                 break
@@ -82,7 +82,7 @@ class Reminders:
                         due_date = dt.datetime(year, month, day, hour, minute, 0)
                         current_datetime = dt.datetime.now()
                         delta = due_date - current_datetime
-                        task_due: Task = Task(name, due_date, delta)
+                        task_due: Task = Task(desc, due_date, delta)
                     except (ValueError, IndexError, TypeError):
                         print('That\'s not a correct time')
                     else:
