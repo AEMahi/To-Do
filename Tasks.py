@@ -16,24 +16,24 @@ class Task:
         self.done = True
 
     def __str__(self) -> str:
-        status: str = '[x]' if self.done else '[ ]'
-        if self.due_date is not None:
-            if  self.delta > datetime.timedelta(seconds=0):
-                if not self.done:
-                    return f'{status} {self.description}: Due {self.due_date.strftime('%B-%d-%Y-%I-%M')}, in {self.delta.days} days, {int(self.delta.seconds // 3600)} hours, and {int((self.delta.seconds % 3600) // 60)} minutes.'
-                else:
-                    return f'{status} {self.description}: Due {self.due_date.strftime('%B-%d-%Y-%I-%M')}'
-            elif datetime.timedelta(seconds=0) == self.delta:
-                return f'{status} {self.description}: Due now'
-            else:
-                if not self.done:
-                    abs_delta = abs(self.delta)
-                    return f'{status} {self.description}: Due {self.due_date.strftime('%B-%d-%Y-%I-%M')}, late by {abs_delta.days} days, {int(abs_delta.seconds // 3600)} hours, and {int((abs_delta.seconds % 3600) // 60)} minutes.'
-                else:
-                    return f'{status} {self.description}: Due {self.due_date.strftime('%B-%d-%Y-%I-%M')}'
-        else:
-            return f'{status} {self.description}'
-        
+        status_desc: str = f"{'[x]' if self.done else '[ ]'} {self.description}"
+
+        if self.due_date is None:
+            return status_desc
+
+        status_desc_due: str = f'{status_desc}: Due {self.due_date.strftime('%B-%d-%Y-%I-%M')}'
+
+        if self.done:
+            return status_desc_due
+
+        def format_delta(delta: datetime.timedelta) -> str:
+            return f'{delta.days} days, {int(delta.seconds // 3600)} hours, and {int((delta.seconds % 3600) // 60)} minutes.'
+
+        if self.delta < datetime.timedelta(seconds=0):
+            return f'{status_desc_due}, late by {format_delta(abs(self.delta))}'
+
+        return f'{status_desc_due}, in {format_delta(self.delta)}'
+
 
 #if self.due_date is none
 
