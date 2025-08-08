@@ -22,6 +22,7 @@ class Task:
         if not self.due_date or not self.delta:
             return status_desc
 
+        # TODO make time of the due date dynamic string not static at creation
         status_desc_due: str = f'{status_desc}: Due {self.due_date.strftime("%B-%d-%Y-%I-%M")}'
 
         delta: dt.timedelta = abs(self.delta)
@@ -66,14 +67,12 @@ class Reminders:
                         break
                 while True:
                     try:
-                        # TODO fix annotations and simplify variables
-                        time = input('Enter the time (Hr:Min AM/PM): ')
-                        time = time.split(' ')
-                        meridiem = time[1]
-                        time = time[0]
-                        time = time.split(':')
-                        hour = int(time[0])
-                        minute = int(time[1])
+                        # TODO double check bugs of time like 12:30 PM
+                        time_choice = input('Enter the time (Hr:Min AM/PM): ')
+                        time_merid: list[str] = time_choice.split(' ')
+                        time, meridiem = time_merid[0], time_merid[1]
+                        hour, minute = map(int, time.split(':'))
+
                         if meridiem.lower() == 'pm':
                             hour += 12
                         due_date = dt.datetime(year, month, day, hour, minute, 0)
