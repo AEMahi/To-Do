@@ -19,21 +19,19 @@ class Task:
     def __str__(self) -> str:
         status_desc: str = f"{'[x]' if self.done else '[ ]'} {self.description}"
 
-        if self.due_date is None or self.delta is None:
+        if not self.due_date or not self.delta:
             return status_desc
 
-        status_desc_due: str = f'{status_desc}: Due {self.due_date.strftime('%B-%d-%Y-%I-%M')}'
+        status_desc_due: str = f'{status_desc}: Due {self.due_date.strftime("%B-%d-%Y-%I-%M")}'
 
         if self.done:
             return status_desc_due
 
-        def format_delta(delta: dt.timedelta) -> str:
-            return f'{delta.days} days, {int(delta.seconds // 3600)} hours, and {int((delta.seconds % 3600) // 60)} minutes.'
+        delta: dt.timedelta = abs(self.delta)
+        delta_str: str = f'{delta.days} days, {delta.seconds // 3600} hours, and {(delta.seconds % 3600) // 60} minutes.'
+        time_status: str = 'late by' if self.delta < dt.timedelta(seconds=0) else 'in'
 
-        if self.delta < dt.timedelta(seconds=0):
-            return f'{status_desc_due}, late by {format_delta(abs(self.delta))}'
-
-        return f'{status_desc_due}, in {format_delta(self.delta)}'
+        return f'{status_desc_due}, {time_status} {delta_str}'
 
 # Define the Reminders class to manage the list of tasks
 class Reminders:
