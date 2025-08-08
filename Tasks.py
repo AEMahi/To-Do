@@ -24,14 +24,11 @@ class Task:
 
         status_desc_due: str = f'{status_desc}: Due {self.due_date.strftime("%B-%d-%Y-%I-%M")}'
 
-        if self.done:
-            return status_desc_due
-
         delta: dt.timedelta = abs(self.delta)
         delta_str: str = f'{delta.days} days, {delta.seconds // 3600} hours, and {(delta.seconds % 3600) // 60} minutes.'
         time_status: str = 'late by' if self.delta < dt.timedelta(seconds=0) else 'in'
 
-        return f'{status_desc_due}, {time_status} {delta_str}'
+        return status_desc_due if self.done else f'{status_desc_due}, {time_status} {delta_str}'
 
 # Define the Reminders class to manage the list of tasks
 class Reminders:
