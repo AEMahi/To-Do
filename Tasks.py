@@ -1,12 +1,12 @@
-import datetime
+import datetime as dt
 
 class Task:
     description: str
     done: bool
-    due_date: datetime.datetime
-    delta: datetime.timedelta
-    
-    def __init__(self, desc: str, due = None, delta = None) -> None:
+    due_date: dt.datetime | None
+    delta: dt.timedelta | None
+
+    def __init__(self, desc: str, due: dt.datetime | None=None, delta: dt.timedelta | None=None) -> None:
         self.description = desc
         self.done = False
         self.due_date = due
@@ -18,7 +18,7 @@ class Task:
     def __str__(self) -> str:
         status_desc: str = f"{'[x]' if self.done else '[ ]'} {self.description}"
 
-        if self.due_date is None:
+        if self.due_date is None or self.delta is None:
             return status_desc
 
         status_desc_due: str = f'{status_desc}: Due {self.due_date.strftime('%B-%d-%Y-%I-%M')}'
@@ -26,10 +26,10 @@ class Task:
         if self.done:
             return status_desc_due
 
-        def format_delta(delta: datetime.timedelta) -> str:
+        def format_delta(delta: dt.timedelta) -> str:
             return f'{delta.days} days, {int(delta.seconds // 3600)} hours, and {int((delta.seconds % 3600) // 60)} minutes.'
 
-        if self.delta < datetime.timedelta(seconds=0):
+        if self.delta < dt.timedelta(seconds=0):
             return f'{status_desc_due}, late by {format_delta(abs(self.delta))}'
 
         return f'{status_desc_due}, in {format_delta(self.delta)}'
@@ -82,8 +82,8 @@ class Reminders:
                         minute = int(time[1])
                         if meridiem.lower() == 'pm':
                             hour = hour + 12
-                        due_date = datetime.datetime(year, month, day, hour, minute, 0)
-                        current_datetime = datetime.datetime.now()
+                        due_date = dt.datetime(year, month, day, hour, minute, 0)
+                        current_datetime = dt.datetime.now()
                         delta = due_date - current_datetime
                         choice = Task(name, due_date, delta)
                     except ValueError:
