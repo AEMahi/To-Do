@@ -1,5 +1,6 @@
-import datetime as dt
 from collections.abc import Callable
+import datetime as dt
+import json
 
 class Task:
     description: str
@@ -139,12 +140,56 @@ class Reminders:
         else:
             print('\nNo tasks to delete')
 
+    def save_to_file(self) -> None:
+        """
+        Save all tasks to a JSON file.
+
+        Each Task object is converted into a dictionary using its __dict__
+        attribute, which stores all instance variables and their values.
+        The list of dictionaries is then written to the JSON file.
+        """
+        
+        while True:
+            filename: str = input('Please enter name for task file: ')
+            if filename[-5:] == '.json':
+                break
+            print('Oops, please ensure file name extension is .json): ')
+
+        # TODO fix bug: datetime is not JSON serializable
+        with open(filename, 'w') as f:
+            json.dump([task.__dict__ for task in self.tasks], f)
+
+
+    def load_from_file(self) -> None:
+        """
+        Load tasks from a JSON file.
+
+        Reads a list of dictionaries from the JSON file, where each dictionary
+        contains the attributes of a Task object. Creates new Task objects
+        by unpacking each dictionary (**dict) into the Task constructor.
+
+        If the file is not found, initializes self.tasks as an empty list.
+        """
+
+        filename: str = input('Please enter valid task file to load from: ')
+        try:
+            with open(filename) as f:
+                self.tasks = [Task(**item) for item in json.load(f)]
+        except FileNotFoundError:
+            reset: str = input('No Task file found! Would you like to restart from empty tasks? [y/n]: ').lower()
+            if reset == 'y':
+                self.tasks = []
+        else:
+            self.view_tasks()
+
     def run(self) -> None:
         actions: dict[str, Callable[[], None]] = {
             '1': self.add_task,
             '2': self.view_tasks,
             '3': self.mark_task_done,
             '4': self.delete_task,
+            '5': self.save_to_file,
+            '6': self.load_from_file,
         }
 
         while True:
@@ -153,17 +198,19 @@ class Reminders:
             print('[2] View Tasks')
             print('[3] Mark Task as Done')
             print('[4] Delete Task')
-            print('[5] Quit')
+            print('[5] Save Tasks')
+            print('[6] Load Tasks')
+            print('[q] Quit')
 
-            choice: str = input('Choose an option (1-5): ')
-            if choice == '5':
+            choice: str = input('Choose an option: ')
+            if choice == 'q':
                 print('Goodbye!')
                 break
 
             try:
                 actions[choice]()
             except KeyError:
-                print('Invalid option. Please choose a number from 1 to 5.')
+                print('Invalid option. Please choose an option from the menu.')
 
 # Main entry point
 if __name__ == '__main__':
