@@ -8,11 +8,11 @@ class Task:
     due_date: dt.datetime | None
     delta: dt.timedelta | None
 
-    def __init__(self, desc: str, due: dt.datetime | None=None, delta: dt.timedelta | None=None) -> None:
+    def __init__(self, desc: str, due: dt.datetime | None=None) -> None:
         self.description = desc
         self.done = False
         self.due_date = due
-        self.delta = delta
+        
 
     def mark_done(self) -> None:
         self.done = True
@@ -20,15 +20,17 @@ class Task:
     def __str__(self) -> str:
         status_desc: str = f"{'[x]' if self.done else '[ ]'} {self.description}"
 
-        if not self.due_date or not self.delta:
+        if not self.due_date:
             return status_desc
 
         # TODO make time of the due date dynamic string not static at creation
+        current_datetime = dt.datetime.now()
+        delta = self.due_date - current_datetime
         status_desc_due: str = f'{status_desc}: Due {self.due_date.strftime("%B-%d-%Y-%I-%M")}'
 
-        delta: dt.timedelta = abs(self.delta)
-        delta_str: str = f'{delta.days} days, {delta.seconds // 3600} hours, and {(delta.seconds % 3600) // 60} minutes.'
-        time_status: str = 'late by' if self.delta < dt.timedelta(seconds=0) else 'in'
+        abs_delta: dt.timedelta = abs(delta)
+        delta_str: str = f'{abs_delta.days} days, {abs_delta.seconds // 3600} hours, and {(abs_delta.seconds % 3600) // 60} minutes.'
+        time_status: str = 'late by' if delta < dt.timedelta(seconds=0) else 'in'
 
         return status_desc_due if self.done else f'{status_desc_due}, {time_status} {delta_str}'
 
@@ -80,9 +82,7 @@ class Reminders:
                             hour = 0
 
                         due_date = dt.datetime(year, month, day, hour, minute, 0)
-                        current_datetime = dt.datetime.now()
-                        delta = due_date - current_datetime
-                        task_due: Task = Task(desc, due_date, delta)
+                        task_due: Task = Task(desc, due_date)
                     except (ValueError, IndexError, TypeError):
                         print('That\'s not a correct time')
                     else:
