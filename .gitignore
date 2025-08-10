@@ -44,4 +44,4 @@ tags
 # Folder icon
 /Icon[^M]
 
-data.json
+*.json
