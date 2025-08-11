@@ -23,14 +23,11 @@ class Task:
         if not self.due_date:
             return status_desc
 
-        # TODO make time of the due date dynamic string not static at creation
-        current_datetime = dt.datetime.now()
-        delta = self.due_date - current_datetime
-        status_desc_due: str = f'{status_desc}: Due {self.due_date.strftime("%B-%d-%Y-%I-%M")}'
+        delta: dt.timedelta = self.due_date - dt.datetime.now()
 
-        abs_delta: dt.timedelta = abs(delta)
-        delta_str: str = f'{abs_delta.days} days, {abs_delta.seconds // 3600} hours, and {(abs_delta.seconds % 3600) // 60} minutes.'
+        status_desc_due: str = f'{status_desc}: Due {self.due_date.strftime("%B-%d-%Y-%I-%M")}'
         time_status: str = 'late by' if delta < dt.timedelta(seconds=0) else 'in'
+        delta_str: str = f'{abs(delta).days} days, {abs(delta).seconds // 3600} hours, and {(abs(delta).seconds % 3600) // 60} minutes.'
 
         return status_desc_due if self.done else f'{status_desc_due}, {time_status} {delta_str}'
 
