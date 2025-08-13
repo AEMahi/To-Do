@@ -1,24 +1,19 @@
+from dataclasses import dataclass, field
 from collections.abc import Callable
 import datetime as dt
 import json
 
+@dataclass
 class Task:
     description: str
-    done: bool
-    due_date: dt.datetime | None
-    delta: dt.timedelta | None
-
-    def __init__(self, desc: str, due: dt.datetime | None=None) -> None:
-        self.description = desc
-        self.done = False
-        self.due_date = due
-        
+    is_done: bool = False
+    due_date: dt.datetime | None = None
 
     def mark_done(self) -> None:
-        self.done = True
+        self.is_done = True
 
     def __str__(self) -> str:
-        status_desc: str = f"{'[x]' if self.done else '[ ]'} {self.description}"
+        status_desc: str = f"{'[x]' if self.is_done else '[ ]'} {self.description}"
 
         if not self.due_date:
             return status_desc
@@ -29,64 +24,58 @@ class Task:
         time_status: str = 'late by' if delta < dt.timedelta(seconds=0) else 'in'
         delta_str: str = f'{abs(delta).days} days, {abs(delta).seconds // 3600} hours, and {(abs(delta).seconds % 3600) // 60} minutes.'
 
-        return status_desc_due if self.done else f'{status_desc_due}, {time_status} {delta_str}'
+        return status_desc_due if self.is_done else f'{status_desc_due}, {time_status} {delta_str}'
 
-# Define the Reminders class to manage the list of tasks
+@dataclass
 class Reminders:
-    tasks: list[Task]
-
-    def __init__(self) -> None:
-        self.tasks = []
+    tasks: list[Task] = field(default_factory=list)
 
     def add_task(self) -> None:
-        '''Ask the user to enter a task description.
-        Create a Task object using that description and add it to self.tasks.
-        Print a confirmation message'''
-         
-        desc = input('What is the task? ')
+        '''Ask the user to enter a task and creates it with all features'''
+
+        task: Task = Task(input('What is the task? '))
+
         while True:
             date_choice: str = input('Do you want a due date? (y/n): ').lower()
 
             if date_choice not in {'y', 'n'}:
                 print('Not a valid response')
-
-            if date_choice == 'n':
-                task: Task = Task(desc)
-                self.tasks.append(task)
-                print(f'Added task "{task}" to Reminder list')
-                break
+                continue
 
             if date_choice == 'y':
                 while True:
+                    date: str = input('Enter the Date (MM/DD/YYYY): ')
                     try:
-                        date: str = input('Enter the Date (MM/DD/YYYY): ')
                         month, day, year = map(int, date.split('/'))
-                    except ValueError:
-                        print('That\'s not a number')
-                    else:
                         break
-                while True:
-                    try:
-                        # TODO double check bugs of time like 12:30 PM
-                        time_choice = input('Enter the time (Hr:Min AM/PM): ')
-                        time_merid: list[str] = time_choice.split(' ')
-                        time, meridiem = time_merid[0], time_merid[1]
-                        hour, minute = map(int, time.split(':'))
+                    except ValueError:
+                        print('Oops, please enter a valid month (1-12) day (1-31) and year (yyyy)')
 
-                        if meridiem.lower() == 'pm' and hour != 12:
+                while True:
+                    time_choice: str = input('Enter the time (Hr:Min AM/PM): ')
+                    time_merid: list[str] = time_choice.split(' ')
+
+                    try:
+                        hour, minute = map(int, time_merid[0].split(':'))
+                        meridiem: str = time_merid[1].lower()
+                    except ValueError:
+                        print('Oops, please enter a valid hour (1-12) and min (0-59)')
+                        continue
+                    except IndexError:
+                        print('Oops, no meridiem found - please enter "am" or "pm" after time with space between')
+                        continue
+                    else:
+                        if meridiem == 'pm' and hour != 12:
                             hour += 12
-                        if meridiem.lower() == 'am' and hour == 12:
+                        if meridiem == 'am' and hour == 12:
                             hour = 0
 
-                        due_date = dt.datetime(year, month, day, hour, minute, 0)
-                        task_due: Task = Task(desc, due_date)
-                    except (ValueError, IndexError, TypeError):
-                        print('That\'s not a correct time')
-                    else:
-                        self.tasks.append(task_due)
-                        print(f'Added task "{task_due}" to Reminder list')
+                        task.due_date = dt.datetime(year, month, day, hour, minute, 0)
                         break
-                break
+
+            self.tasks.append(task)
+            print(f'Added task "{task}" to Reminder list')
+            break
 
     def view_tasks(self) -> None:
         '''Print all tasks in self.tasks.
