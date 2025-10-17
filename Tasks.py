@@ -1,7 +1,7 @@
-from dataclasses import dataclass, field
-from collections.abc import Callable
 import datetime as dt
-import json
+from collections.abc import Callable
+from dataclasses import dataclass, field
+
 
 @dataclass
 class Task:
@@ -9,11 +9,8 @@ class Task:
     is_done: bool = False
     due_date: dt.datetime | None = None
 
-    def mark_done(self) -> None:
-        self.is_done = True
-
     def __str__(self) -> str:
-        status_desc: str = f"{'[x]' if self.is_done else '[ ]'} {self.description}"
+        status_desc: str = f'{"[x]" if self.is_done else "[ ]"} {self.description}'
 
         if not self.due_date:
             return status_desc
@@ -26,12 +23,17 @@ class Task:
 
         return status_desc_due if self.is_done else f'{status_desc_due}, {time_status} {delta_str}'
 
+
 @dataclass
 class Reminders:
     tasks: list[Task] = field(default_factory=list)
 
+    def __len__(self) -> int:
+        """Number of tasks"""
+        return len(self.tasks)
+
     def add_task(self) -> None:
-        '''Ask the user to enter a task and creates it with all features'''
+        """Ask the user to enter a task and creates it with all features"""
 
         task: Task = Task(input('What is the task? '))
 
@@ -78,101 +80,59 @@ class Reminders:
             break
 
     def view_tasks(self) -> None:
-        '''Print all tasks in self.tasks.
-        Use a loop to show each task with its number and status.
-        Print a message if there are no tasks.'''
+        """Print all tasks in self.tasks"""
+        if len(self) == 0:
+            print('No Tasks')
+            return
 
-        if len(self.tasks) > 0:
-            for index, task in enumerate(self.tasks, start=1):
-                print(f'\nTask {index}: {task}')
-        else:
-            print('\nNo tasks')
+        for index, task in enumerate(self.tasks, start=1):
+            print(f'\nTask {index}: {task}')
 
-    def mark_task_done(self) -> None:
-        '''Show tasks, ask user for a task number, and mark that task as done.
-        Handle invalid input with try/except and input checks.'''
+    def mark_done(self) -> None:
+        """Show tasks, ask user for a task number, and mark that task as done"""
+        if len(self) == 0:
+            print('No Tasks')
+            return
 
-        if len(self.tasks) > 0:
-            self.view_tasks()
-            while True:
-                try:
-                    task_id: int = int(input('\nEnter task number to mark as done: '))
-                    self.tasks[task_id - 1].mark_done()
-                except IndexError:
-                    print('Invalid task number')
-                except ValueError:
-                    print('That\'s not a number')
-                else:
-                    print(f'Marked task "{self.tasks[task_id - 1]}" as done' )
-                    break
-        else:
-            print('\nNo tasks')
+        while True:
+            try:
+                task_id: int = int(input('\nEnter task number to mark as done: '))
+                task: Task = self.tasks[task_id - 1]
+            except (IndexError, ValueError):
+                print(f'Invalid task id: Please choose integer from 0 ... {len(self)}')
+            else:
+                task.is_done = True
+                print(f'Marked task "{task}" as done')
+                break
 
     def delete_task(self) -> None:
-        '''Show tasks, ask user for a task number, and remove that task from the list.
-        Handle invalid input safely.'''
+        """Show tasks, ask user for a task number, and remove that task from the list"""
+        if len(self) == 0:
+            print('No Tasks')
+            return
 
-        if len(self.tasks) > 0:
-            self.view_tasks()
-
-            while True:
-                try:
-                    task_id: int = int(input('\nWhich task would you like to delete? '))
-                    del self.tasks[task_id - 1]
-                except (IndexError, ValueError):
-                    print('Invalid task number, please re-enter.')
-                else:
-                    break
-        else:
-            print('\nNo tasks to delete')
+        while True:
+            try:
+                task_id: int = int(input('\nWhich task would you like to delete? '))
+                del self.tasks[task_id - 1]
+            except (IndexError, ValueError):
+                print('Invalid task number, please re-enter.')
+            else:
+                break
 
     def save_to_file(self) -> None:
-        """
-        Save all tasks to a JSON file.
-
-        Each Task object is converted into a dictionary using its __dict__
-        attribute, which stores all instance variables and their values.
-        The list of dictionaries is then written to the JSON file.
-        """
-        
-        while True:
-            filename: str = input('Please enter name for task file: ')
-            if filename[-5:] == '.json':
-                break
-            print('Oops, please ensure file name extension is .json): ')
-
-        # TODO fix bug: datetime is not JSON serializable
-        with open(filename, 'w') as f:
-            json.dump([task.__dict__ for task in self.tasks], f)
-
+        """Save all tasks to a JSON file"""
+        pass
 
     def load_from_file(self) -> None:
-        """
-        Load tasks from a JSON file.
-
-        Reads a list of dictionaries from the JSON file, where each dictionary
-        contains the attributes of a Task object. Creates new Task objects
-        by unpacking each dictionary (**dict) into the Task constructor.
-
-        If the file is not found, initializes self.tasks as an empty list.
-        """
-
-        filename: str = input('Please enter valid task file to load from: ')
-        try:
-            with open(filename) as f:
-                self.tasks = [Task(**item) for item in json.load(f)]
-        except FileNotFoundError:
-            reset: str = input('No Task file found! Would you like to restart from empty tasks? [y/n]: ').lower()
-            if reset == 'y':
-                self.tasks = []
-        else:
-            self.view_tasks()
+        """Load tasks from a JSON file"""
+        pass
 
     def run(self) -> None:
         actions: dict[str, Callable[[], None]] = {
             '1': self.add_task,
             '2': self.view_tasks,
-            '3': self.mark_task_done,
+            '3': self.mark_done,
             '4': self.delete_task,
             '5': self.save_to_file,
             '6': self.load_from_file,
@@ -197,8 +157,3 @@ class Reminders:
                 actions[choice]()
             except KeyError:
                 print('Invalid option. Please choose an option from the menu.')
-
-# Main entry point
-if __name__ == '__main__':
-    app: Reminders = Reminders()
-    app.run()
